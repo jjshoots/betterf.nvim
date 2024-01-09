@@ -1,5 +1,7 @@
 # BetterF - A better way to F around
 
+**Jump to any line and column in only 3-4 keystrokes!**
+
 ![F Around](./betterf.gif)
 
 > This is basically a no-node, no-coc, pure Lua version of [neoclide/coc-smartf](https://github.com/neoclide/coc-smartf).
