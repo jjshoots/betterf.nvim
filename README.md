@@ -20,6 +20,9 @@ jjshoots/betterf.nvim
 ## Setup
 
 ```lua
+-- require the thing
+require('betterf')
+
 -- Map a key to trigger the function (you can customize this key, I use <leader>f and <leader>F here)
 vim.api.nvim_set_keymap('n', '<Leader>f', [[:lua betterF(true)<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<Leader>F', [[:lua betterF(false)<CR>]], { noremap = true, silent = true })
