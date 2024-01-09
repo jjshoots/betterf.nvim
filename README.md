@@ -20,10 +20,16 @@ jjshoots/betterf.nvim
 ## Setup
 
 ```lua
--- require the thing
-require('betterf')
+require('betterf').setup {
+    -- all labels to use in order, the last character is used for accessing overflow indices
+    labels = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",";"},
 
--- Map a key to trigger the function (you can customize this key, I use <leader>f and <leader>F here)
-vim.api.nvim_set_keymap('n', '<Leader>f', [[:lua betterF(true)<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>F', [[:lua betterF(false)<CR>]], { noremap = true, silent = true })
+    -- the highlight color for the markers
+    color="#ff0000",
+
+    -- forward and backward search mappings
+    mappings={
+        "<leader>f", "<leader>F"
+    }
+}
 ```
