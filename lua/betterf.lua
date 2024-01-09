@@ -120,8 +120,8 @@ function M.setup(opts)
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
 
     -- keymaps
-    vim.keymap_set('n', conf.mappings[1], function() betterF(true) end, { noremap = true, silent = true })
-    vim.keymap_set('n', conf.mappings[2], function() betterF(false) end, { noremap = true, silent = true })
+    vim.keymap_set('n', "<leader>f", function() betterF(true) end, { noremap = true, silent = true })
+    vim.keymap_set('n', "<leader>F", function() betterF(false) end, { noremap = true, silent = true })
 end
 
 return M
