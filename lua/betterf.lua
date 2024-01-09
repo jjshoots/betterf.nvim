@@ -102,7 +102,3 @@ function betterF(is_forward)
         vim.cmd("redraw!")
     end
 end
-
--- Map a key to trigger the function (you can customize this key)
-vim.api.nvim_set_keymap('n', '<Leader>f', [[:lua betterF(true)<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>F', [[:lua betterF(false)<CR>]], { noremap = true, silent = true })
