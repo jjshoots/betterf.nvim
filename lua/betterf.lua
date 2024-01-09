@@ -1,7 +1,10 @@
 local M = {}
 local conf = {
     labels = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",";"},
-    color="#ff0000"
+    color="#ff0000",
+    mappings={
+        "<leader>f", "<leader>F"
+    }
 }
 
 local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
@@ -116,8 +119,9 @@ function M.setup(opts)
     -- highlight group for colors
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
 
-    M.betterF_front = betterF(true)
-    M.betterF_back = betterF(false)
+    -- keymaps
+    vim.api.nvim_set_keymap('n', conf.mappings[1], [[:lua betterF(true)<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', conf.mappings[2], [[:lua betterF(false)<CR>]], { noremap = true, silent = true })
 end
 
 return M
