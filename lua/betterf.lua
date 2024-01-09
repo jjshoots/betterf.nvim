@@ -116,14 +116,12 @@ function M.setup(opts)
     -- config
     conf = vim.tbl_deep_extend("keep", conf, opts or {})
 
-    print(conf.mappings[1])
-
     -- highlight group for colors
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
 
     -- keymaps
-    vim.keymap.set("n", conf.mappings[1], function() betterF(true) end)
-    vim.keymap.set("n", conf.mappings[2], function() betterF(false) end)
+    vim.api.nvim_set_keymap('n', conf.mappings[1], function() betterF(true) end, { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', conf.mappings[2], function() betterF(false) end, { noremap = true, silent = true })
 end
 
 return M
