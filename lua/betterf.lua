@@ -1,7 +1,8 @@
-vim.api.nvim_command("highlight betterFHighlightGroup guifg=#ff0000")
-
--- list of characters that we will use to index things
-local possible_char_idx = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",";"}
+local M = {}
+local conf = {
+    labels = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",";"},
+    color="#ff0000"
+}
 
 local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
     -- dictionary of index_char: {row_num, col_num}
@@ -42,10 +43,10 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
                 num_matches = num_matches + 1
 
                 -- the character index for this match
-                local char_idx = possible_char_idx[math.min(num_matches, #possible_char_idx)]
+                local char_idx = conf.labels[math.min(num_matches, #conf.labels)]
 
                 -- record the char index
-                if num_matches <= #possible_char_idx then
+                if num_matches <= #conf.labels then
                     char_match_idx[char_idx] = {row_num, col_num+offset}
                 end
 
@@ -66,9 +67,14 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
     return char_match_idx
 end
 
-function betterF(is_forward)
+local function betterF(is_forward)
+    local match_value = vim.fn.getchar()
+    if match_value == 27 then
+        return
+    end
+
     -- metadata for the search: the matched character, current buffer number and namespace for virtual text
-    local match_char = vim.fn.getcharstr()
+    local match_char = vim.fn.nr2char(match_value)
     local buf_num = vim.fn.bufnr()
     local ns_id = vim.api.nvim_create_namespace("betterF")
 
@@ -82,17 +88,17 @@ function betterF(is_forward)
         vim.cmd("redraw!")
 
         -- get the user's requested jump location
-        local jump_index = vim.fn.getchar()
-        local jump_char = vim.fn.nr2char(jump_index)
+        local jump_value = vim.fn.getchar()
+        local jump_char = vim.fn.nr2char(jump_value)
         complete = true
 
         -- if it's not escape and the character exists in the matches, jump to the location
-        if jump_index ~= 27 and index_char_match[jump_char] then
+        if jump_value ~= 27 and index_char_match[jump_char] then
             local jump_location = index_char_match[jump_char]
             vim.api.nvim_win_set_cursor({0}, {jump_location[1], jump_location[2]-1})
 
             -- if it's the last character, exit, otherwise we need to repeat the loop
-            if jump_char == possible_char_idx[#possible_char_idx] then
+            if jump_char == conf.labels[#conf.labels] then
                 complete = false
             end
         end
@@ -102,3 +108,16 @@ function betterF(is_forward)
         vim.cmd("redraw!")
     end
 end
+
+function M.setup(opts)
+    -- config
+    conf = vim.tbl_deep_extend("force", conf, opts or {})
+
+    -- highlight group for colors
+    vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
+
+    M.betterF_front = betterF(true)
+    M.betterF_back = betterF(false)
+end
+
+return M
