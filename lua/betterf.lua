@@ -113,9 +113,8 @@ local function betterF(is_forward)
 end
 
 function M.setup(opts)
-    print("aldksjfhasldjfhasldjfhalskjdhflakjshdflkjh")
     -- config
-    conf = vim.tbl_deep_extend("force", conf, opts or {})
+    conf = vim.tbl_deep_extend("keep", conf, opts or {})
 
     -- highlight group for colors
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
