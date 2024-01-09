@@ -120,8 +120,8 @@ function M.setup(opts)
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
 
     -- keymaps
-    vim.keymap.set("n", conf.mappings[1], betterF(true))
-    vim.keymap.set("n", conf.mappings[2], betterF(false))
+    vim.keymap.set("n", conf.mappings[1], function() betterF(true) end)
+    vim.keymap.set("n", conf.mappings[2], function() betterF(false) end)
 end
 
 return M
