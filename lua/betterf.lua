@@ -113,6 +113,7 @@ local function betterF(is_forward)
 end
 
 function M.setup(opts)
+    print("aldksjfhasldjfhasldjfhalskjdhflakjshdflkjh")
     -- config
     conf = vim.tbl_deep_extend("force", conf, opts or {})
 
