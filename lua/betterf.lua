@@ -98,7 +98,7 @@ function betterF(is_forward)
         -- if it's not escape and the character exists in the matches, jump to the location
         if jump_value ~= 27 and index_char_match[jump_char] then
             local jump_location = index_char_match[jump_char]
-            vim.api.nvim_win_set_cursor({0}, {jump_location[1], jump_location[2]-1})
+            vim.api.nvim_win_set_cursor(0, {jump_location[1], jump_location[2]-1})
 
             -- if it's the last character, exit, otherwise we need to repeat the loop
             if jump_char == conf.labels[#conf.labels] then
