@@ -70,7 +70,7 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
     return char_match_idx
 end
 
-function betterF(is_forward)
+local function betterF(is_forward)
     local match_value = vim.fn.getchar()
     if match_value == 27 then
         return
@@ -112,6 +112,8 @@ function betterF(is_forward)
     end
 end
 
+M.betterF = betterF
+
 function M.setup(opts)
     -- config
     conf = vim.tbl_deep_extend("keep", conf, opts or {})
@@ -120,8 +122,8 @@ function M.setup(opts)
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
 
     -- keymaps
-    vim.api.nvim_set_keymap('n', conf.mappings[1], [[:lua betterF(true)<CR>]], { noremap = true, silent = true })
-    vim.api.nvim_set_keymap('n', conf.mappings[2], [[:lua betterF(false)<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', conf.mappings[1], [[:lua require'betterf'.betterF(true)<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', conf.mappings[2], [[:lua require'betterf'.betterF(false)<CR>]], { noremap = true, silent = true })
 end
 
 return M
