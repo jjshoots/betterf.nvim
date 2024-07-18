@@ -116,7 +116,7 @@ M.betterF = betterF
 
 function M.setup(opts)
     -- config
-    conf = vim.tbl_deep_extend("keep", conf, opts or {})
+    conf = vim.tbl_deep_extend("keep", opts or {}, conf)
 
     -- highlight group for colors
     vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
