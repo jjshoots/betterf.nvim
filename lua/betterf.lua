@@ -70,7 +70,7 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
     return char_match_idx
 end
 
-local function betterF(is_forward)
+local function betterF(is_forward, motion_command)
     local match_value = vim.fn.getchar()
     if match_value == 27 then
         return
@@ -98,11 +98,21 @@ local function betterF(is_forward)
         -- if it's not escape and the character exists in the matches, jump to the location
         if jump_value ~= 27 and index_char_match[jump_char] then
             local jump_location = index_char_match[jump_char]
-            vim.api.nvim_win_set_cursor(0, {jump_location[1], jump_location[2]-1})
+            local start_pos = vim.api.nvim_win_get_cursor(0)
+            local start_row = start_pos[1] - 1
+            local start_col = start_pos[2]
+            local end_row = jump_location[1] - 1
+            local end_col = jump_location[2]
 
-            -- if it's the last character, exit, otherwise we need to repeat the loop
-            if jump_char == conf.labels[#conf.labels] then
-                complete = false
+            if motion_command == 'd' then
+                vim.api.nvim_buf_set_text(buf_num, start_row, start_col, end_row, end_col, {})
+            else
+                vim.api.nvim_win_set_cursor(0, {jump_location[1], jump_location[2]-1})
+
+                -- if it's the last character, exit, otherwise we need to repeat the loop
+                if jump_char == conf.labels[#conf.labels] then
+                    complete = false
+                end
             end
         end
 
