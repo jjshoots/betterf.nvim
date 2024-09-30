@@ -133,7 +133,9 @@ function M.setup(opts)
 
     -- keymaps
     vim.api.nvim_set_keymap('n', conf.mappings[1], [[:lua require'betterf'.betterF(true)<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', 'd'..conf.mappings[1], [[:lua require'betterf'.betterF(true,'d')<CR>]], { noremap = true, silent = true })
     vim.api.nvim_set_keymap('n', conf.mappings[2], [[:lua require'betterf'.betterF(false)<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', 'd'..conf.mappings[2], [[:lua require'betterf'.betterF(false,'d')<CR>]], { noremap = true, silent = true })
 end
 
 return M
