@@ -121,7 +121,7 @@ local function betterF(is_forward)
             match_char,
             is_forward,
             search_from_row,
-            search_from_col,
+            search_from_col
         )
         vim.cmd("redraw!")
 
