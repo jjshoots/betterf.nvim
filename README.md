@@ -2,6 +2,8 @@
 
 **Jump to any line and column in only 3-4 keystrokes!**
 
+Also works in visual mode, and with `c` & `d` motions. (Courtesy of [LeonWiese](https://github.com/LeonWiese))
+
 ![F Around](./betterf.gif)
 
 > This is basically a no-node, no-coc, pure Lua version of [neoclide/coc-smartf](https://github.com/neoclide/coc-smartf).
@@ -9,27 +11,56 @@
 > Couldn't find a better alternative to smartf around, so I made my own.
 > Enjoy!
 
-## Installation
+## Setup & Installation
 
-Use your favourite plugin installer. E.g., for VimPlug:
+Use your favourite plugin installer. E.g., for `Lazy`:
 
 ```
-jjshoots/betterf.nvim
-```
+local function config_function()
+	require("betterf").setup({
+		labels = {
+			"a",
+			"b",
+			"c",
+			"d",
+			"e",
+			"f",
+			"g",
+			"h",
+			"i",
+			"j",
+			"k",
+			"l",
+			"m",
+			"n",
+			"o",
+			"p",
+			"q",
+			"r",
+			"s",
+			"t",
+			"u",
+			"v",
+			"w",
+			"x",
+			"y",
+			"z",
+			";",
+		},
+		color = "#ff0000",
+		mappings = {
+			"<leader>f",
+			"<leader>F",
+		},
+	})
+end
 
-## Setup
-
-```lua
-require('betterf').setup {
-    -- all labels to use in order, the last character is used for accessing overflow indices
-    labels = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",";"},
-
-    -- the highlight color for the markers
-    color="#ff0000",
-
-    -- forward and backward search mappings
-    mappings={
-        "<leader>f", "<leader>F"
-    }
+return {
+	"jjshoots/betterf.nvim",
+	config = config_function,
+	keys = {
+		"<leader>f",
+		"<leader>F",
+	},
 }
 ```
