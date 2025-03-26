@@ -1,35 +1,60 @@
 local M = {}
 local conf = {
-    labels = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",";"},
-    color="#ff0000",
-    mappings={
-        "<leader>f", "<leader>F"
-    }
+    labels = {
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        ";",
+    },
+    color = "#ff0000",
+    mappings = {
+        "<leader>f",
+        "<leader>F",
+    },
 }
 
-local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
+local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, search_from_row, search_from_col)
     -- dictionary of index_char: {row_num, col_num}
     local num_matches = 0
     local char_match_idx = {}
 
-    -- grab the current cursor location
-    local cursor_row_num, cursor_col_num = vim.fn.line("."), vim.fn.col(".")
-
     -- loop through each row in the buffer
-    local row_num = cursor_row_num
-    local col_num = cursor_col_num
+    local row_num, col_num = search_from_row, search_from_col
     while (1 <= row_num) and (row_num <= vim.fn.line("w$")) do
         -- get the content of the row
         local offset = 0
         local row_content = vim.fn.getline(row_num)
 
         -- if we are on the current line, only get from the current cursor position
-        if row_num == cursor_row_num then
+        if row_num == search_from_row then
             if is_forward then
-                row_content = string.sub(row_content, cursor_col_num+1, -1)
-                offset = cursor_col_num
+                row_content = string.sub(row_content, search_from_col + 1, -1)
+                offset = search_from_col
             else
-                row_content = string.sub(row_content, 1, cursor_col_num-1)
+                row_content = string.sub(row_content, 1, search_from_col - 1)
             end
         end
 
@@ -50,15 +75,15 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
 
                 -- record the char index
                 if num_matches <= #conf.labels then
-                    char_match_idx[char_idx] = {row_num, col_num+offset}
+                    char_match_idx[char_idx] = { row_num, col_num + offset }
                 end
 
                 -- create the virtual text
                 local opts = {
-                    virt_text = {{char_idx, "betterFHighlightGroup"}},
+                    virt_text = { { char_idx, "betterFHighlightGroup" } },
                     virt_text_pos = "overlay",
                 }
-                vim.api.nvim_buf_set_extmark(buf_num, ns_id, row_num-1, col_num+offset-1, opts)
+                vim.api.nvim_buf_set_extmark(buf_num, ns_id, row_num - 1, col_num + offset - 1, opts)
             end
             -- increment the col number
             col_num = is_forward and (col_num + 1) or (col_num - 1)
@@ -83,9 +108,12 @@ local function betterF(is_forward)
 
     -- keep finding until we complete
     local complete = false
+    local search_from_row, search_from_col = vim.fn.line("."), vim.fn.col(".")
+
     while not complete do
         -- get all matches, this is a dictionary of index_char: {row_num, col_num}
-        local index_char_match = findInstancesAndReplace(buf_num, ns_id, match_char, is_forward)
+        local index_char_match =
+            findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, search_from_row, search_from_col)
 
         -- redraw
         vim.cmd("redraw!")
@@ -93,17 +121,20 @@ local function betterF(is_forward)
         -- get the user's requested jump location
         local jump_value = vim.fn.getchar()
         local jump_char = vim.fn.nr2char(jump_value)
-        complete = true
 
         -- if it's not escape and the character exists in the matches, jump to the location
         if jump_value ~= 27 and index_char_match[jump_char] then
             local jump_location = index_char_match[jump_char]
-            vim.api.nvim_win_set_cursor(0, {jump_location[1], jump_location[2]-1})
 
-            -- if it's the last character, exit, otherwise we need to repeat the loop
+            -- if it's not the last character, search on and repeat the loop, otherwise move and exit
             if jump_char == conf.labels[#conf.labels] then
-                complete = false
+                search_from_row, search_from_col = jump_location[1], jump_location[2] - 1
+            else
+                vim.api.nvim_win_set_cursor(0, { jump_location[1], jump_location[2] - 1 })
+                complete = true
             end
+        else
+            complete = true
         end
 
         -- clear the highlights, redraw
@@ -119,11 +150,16 @@ function M.setup(opts)
     conf = vim.tbl_deep_extend("keep", opts or {}, conf)
 
     -- highlight group for colors
-    vim.api.nvim_command("highlight betterFHighlightGroup guifg="..conf.color)
+    vim.api.nvim_command("highlight betterFHighlightGroup guifg=" .. conf.color)
 
     -- keymaps
-    vim.api.nvim_set_keymap('n', conf.mappings[1], [[:lua require'betterf'.betterF(true)<CR>]], { noremap = true, silent = true })
-    vim.api.nvim_set_keymap('n', conf.mappings[2], [[:lua require'betterf'.betterF(false)<CR>]], { noremap = true, silent = true })
+    vim.keymap.set({ "n", "o", "v" }, conf.mappings[1], function()
+        betterF(true)
+    end, { noremap = true, silent = true, desc = "BetterF forward" })
+
+    vim.keymap.set({ "n", "o", "v" }, conf.mappings[2], function()
+        betterF(false)
+    end, { noremap = true, silent = true, desc = "BetterF backward" })
 end
 
 return M
