@@ -93,6 +93,7 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, s
         row_num = is_forward and (row_num + 1) or (row_num - 1)
     end
 
+    -- return the matches
     return char_match_idx
 end
 
@@ -106,23 +107,23 @@ local function betterF(is_forward)
     local match_char = vim.fn.nr2char(match_value)
     local buf_num = vim.fn.bufnr()
     local ns_id = vim.api.nvim_create_namespace("betterF")
-    local function resetCanvas()
-        -- clears highlights and annotations
-        vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
-        vim.cmd("redraw!")
-    end
 
     -- keep finding until we complete
     local search_from_row, search_from_col = vim.fn.line("."), vim.fn.col(".")
 
     while true do
-        -- redraw
-        resetCanvas()
-
         -- get all matches, this is a dictionary of index_char: {row_num, col_num}
         -- this also does the drawing
-        local index_char_match =
-            findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, search_from_row, search_from_col)
+        vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
+        local index_char_match = findInstancesAndReplace(
+            buf_num,
+            ns_id,
+            match_char,
+            is_forward,
+            search_from_row,
+            search_from_col,
+        )
+        vim.cmd("redraw!")
 
         -- get the user's requested jump location
         local jump_value = vim.fn.getchar()
@@ -130,7 +131,6 @@ local function betterF(is_forward)
 
         -- if escape pressed or the character doesn't exist in the matches, exit
         if jump_value == 27 or not index_char_match[jump_char] then
-            resetCanvas()
             break
         end
 
@@ -140,13 +140,16 @@ local function betterF(is_forward)
         -- if the jump location is not the last character, jump there and exit
         if jump_char ~= conf.labels[#conf.labels] then
             vim.api.nvim_win_set_cursor(0, { jump_location[1], jump_location[2] - 1 })
-            resetCanvas()
             break
         end
 
         -- if we reach here, the user is still searching, update search starting locations and retry search
         search_from_row, search_from_col = jump_location[1], jump_location[2] - 1
     end
+
+    -- clear the annotations
+    vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
+    vim.cmd("redraw!")
 end
 
 M.betterF = betterF
