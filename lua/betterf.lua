@@ -36,6 +36,12 @@ local conf = {
     },
 }
 
+local function resetCanvas()
+    -- clears highlights and annotations
+    vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
+    vim.cmd("redraw!")
+end
+
 local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, search_from_row, search_from_col)
     -- dictionary of index_char: {row_num, col_num}
     local num_matches = 0
@@ -107,39 +113,39 @@ local function betterF(is_forward)
     local ns_id = vim.api.nvim_create_namespace("betterF")
 
     -- keep finding until we complete
-    local complete = false
     local search_from_row, search_from_col = vim.fn.line("."), vim.fn.col(".")
 
-    while not complete do
+    while true do
+        -- redraw
+        resetCanvas()
+
         -- get all matches, this is a dictionary of index_char: {row_num, col_num}
+        -- this also does the drawing
         local index_char_match =
             findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, search_from_row, search_from_col)
-
-        -- redraw
-        vim.cmd("redraw!")
 
         -- get the user's requested jump location
         local jump_value = vim.fn.getchar()
         local jump_char = vim.fn.nr2char(jump_value)
 
-        -- if it's not escape and the character exists in the matches, jump to the location
-        if jump_value ~= 27 and index_char_match[jump_char] then
-            local jump_location = index_char_match[jump_char]
-
-            -- if it's not the last character, search on and repeat the loop, otherwise move and exit
-            if jump_char == conf.labels[#conf.labels] then
-                search_from_row, search_from_col = jump_location[1], jump_location[2] - 1
-            else
-                vim.api.nvim_win_set_cursor(0, { jump_location[1], jump_location[2] - 1 })
-                complete = true
-            end
-        else
-            complete = true
+        -- if escape pressed or the character doesn't exist in the matches, exit
+        if jump_value == 27 or not index_char_match[jump_char] then
+            resetCanvas()
+            break
         end
 
-        -- clear the highlights, redraw
-        vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
-        vim.cmd("redraw!")
+        -- update the jump location to what the user selected since it exists
+        local jump_location = index_char_match[jump_char]
+
+        -- if the jump location is not the last character, jump there and exit
+        if jump_char ~= conf.labels[#conf.labels] then
+            vim.api.nvim_win_set_cursor(0, { jump_location[1], jump_location[2] - 1 })
+            resetCanvas()
+            break
+        end
+
+        -- if we reach here, the user is still searching, update search starting locations and retry search
+        search_from_row, search_from_col = jump_location[1], jump_location[2] - 1
     end
 end
 
