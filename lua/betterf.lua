@@ -36,11 +36,6 @@ local conf = {
     },
 }
 
-local function resetCanvas()
-    -- clears highlights and annotations
-    vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
-    vim.cmd("redraw!")
-end
 
 local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, search_from_row, search_from_col)
     -- dictionary of index_char: {row_num, col_num}
@@ -111,6 +106,11 @@ local function betterF(is_forward)
     local match_char = vim.fn.nr2char(match_value)
     local buf_num = vim.fn.bufnr()
     local ns_id = vim.api.nvim_create_namespace("betterF")
+    local function resetCanvas()
+        -- clears highlights and annotations
+        vim.api.nvim_buf_clear_namespace(buf_num, ns_id, 0, -1)
+        vim.cmd("redraw!")
+    end
 
     -- keep finding until we complete
     local search_from_row, search_from_col = vim.fn.line("."), vim.fn.col(".")
