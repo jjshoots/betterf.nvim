@@ -72,7 +72,7 @@ local function findInstancesAndReplace(buf_num, ns_id, match_char, is_forward, s
                 num_matches = num_matches + 1
 
                 -- the character index for this match
-                local char_idx = conf.labels[math.min(num_matches, #conf.labels)]
+                local char_idx = conf.labels[math.min(num_matches, #conf.labels - 1)]
 
                 -- record the char index
                 if num_matches <= #conf.labels then
@@ -144,6 +144,8 @@ local function betterF(is_forward)
         end
 
         -- if we reach here, the user is still searching, update search starting locations and retry search
+        -- we update to one before the final character since the last character is only used for rollover
+        jump_location = index_char_match[conf.labels[#conf.labels - 1]]
         search_from_row, search_from_col = jump_location[1], jump_location[2] - 1
     end
 
