@@ -145,8 +145,8 @@ local function betterF(is_forward)
 
         -- if we reach here, the user is still searching, update search starting locations and retry search
         -- we update to one before the final character since the last character is only used for rollover
-        jump_location = index_char_match[conf.labels[#conf.labels]]
-        search_from_row, search_from_col = jump_location[1], jump_location[2] - 1
+        local new_search_location = index_char_match[conf.labels[#conf.labels]]
+        search_from_row, search_from_col = new_search_location[1], new_search_location[2] - 1
     end
 
     -- clear the annotations
