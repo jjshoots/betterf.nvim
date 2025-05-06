@@ -149,7 +149,7 @@ local function betterF(is_forward)
           -- we update to one before the final character since the last character is only used for rollover
           new_search_location = index_char_match[conf.labels[#conf.labels]]
         else
-          new_search_location = index_char_match[conf.labels[#conf.labels] - 1]
+          new_search_location = index_char_match[conf.labels[#conf.labels - 1]]
         end
         search_from_row, search_from_col = new_search_location[1], new_search_location[2] - 1
     end
